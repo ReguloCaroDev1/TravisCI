@@ -1,3 +1,5 @@
+
+[![Build Status](https://app.travis-ci.com/ReguloCaroDev1/TravisCI.svg?branch=main)](https://app.travis-ci.com/ReguloCaroDev1/TravisCI)
 # Django-and-Django-REST-Framework
 
 ## Setup

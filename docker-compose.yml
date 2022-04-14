@@ -1,0 +1,44 @@
+version: '3'
+services:
+  # DON'T FORGET TO CHANGE THE XX WITH YOUR PORT
+  # YOUR_USER WITH YOUR UNIX USER
+  postgres_db09:
+    image: postgres:14-alpine
+    container_name: "postgres${PORT}"
+    environment:
+      - "POSTGRES_PASSWORD=${PSQL_PASS}"
+      - "POSTGRES_DB=${PSQL_DBNAME}"
+      - "POSTGRES_USER=${PSQL_USERNAME}"
+    ports:
+      - "100${PORT}:55${PORT}"
+    volumes:
+      - "${POSTGRES_VOLUME_PATH}:/usr/src/postgres"
+    networks:
+      - our-library-net
+    command: -p 55${PORT}
+
+  web09:
+    build: .
+    command: bash -c "python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:80${PORT}"
+    container_name: "django${PORT}"
+    depends_on:
+      - postgres_db09
+    environment:
+      - "PSQL_DBNAME=${PSQL_DBNAME}"
+      - "PSQL_USERNAME=${PSQL_USERNAME}"
+      - "PSQL_PASS=${PSQL_PASS}"
+      - "PSQL_HOST=postgres${PORT}"
+      - "PSQL_PORT=55${PORT}"
+      - "JWT_TOKEN_TIME=${JWT_TOKEN_TIME}"
+    volumes:
+      # "RUTA/DEL/SERVIDOR:RUTA/DENTRO/DEL/CONTENEDOR"
+      - "${DJANGO_VOLUME_PATH}:/usr/src/django/library"
+    ports:
+      - "90${PORT}:80${PORT}"
+    networks:
+      - our-library-net
+
+networks:
+  our-library-net:
+    external: true
+    driver: bridge
